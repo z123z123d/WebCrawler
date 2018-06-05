@@ -4,7 +4,7 @@
 
 目前已实现基类接口（主要以助教ppt上的实现方法为框架）
 
-##6.5
+## 6.5
 
 加入了基本数据类：IntData,DoubleData,StringData,VectorStringData。
 

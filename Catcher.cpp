@@ -7,13 +7,17 @@ Catcher:: Catcher() {
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
+Catcher::~Catcher() {
+	curl_global_cleanup();
+}
+
 void Catcher:: printLog(const string &Log) {
 	fprintf (stderr, "%s\n", Log.c_str());
 }
 
 bool Catcher:: saveFile(const string &url, const string &fileName, const bool &isImage) {
 	if (access(fileName.c_str(), 0) != -1) { //check whether the file exists
-		printLog ("File exist\n");
+		printLog ("File exists, quit downloading.\n");
 		return true;
 	}
 	CURLcode res;
@@ -28,7 +32,7 @@ bool Catcher:: saveFile(const string &url, const string &fileName, const bool &i
 	res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 	if (res != CURLE_OK) { //fail to download image
-		printLog("fail to download image.\n");
+		printLog("Fail to download image.\n");
 		system(("rm " + fileName).c_str());
 		return false;
 	}

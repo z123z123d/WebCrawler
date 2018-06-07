@@ -7,8 +7,10 @@ class Catcher {
 	static Catcher catcher;
 	
 	Catcher();
+    ~Catcher();
 public:
     void printLog(const string &);
     bool saveFile(const string &, const string &, const bool & = 0);
-    ~Catcher() = delete;
+    Catcher (const Catcher&) = delete;
+    void operator = (const Catcher&) = delete;
 };

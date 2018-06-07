@@ -4,12 +4,11 @@
 using namespace std;
 
 class Catcher {
-    CURL *curl;
+	static Catcher catcher;
+	
+	Catcher();
 public:
-    Catcher();
     void printLog(const string &);
     bool saveFile(const string &, const string &, const bool & = 0);
-    ~Catcher();
+    ~Catcher() = delete;
 };
-
-//static Catcher catcher;

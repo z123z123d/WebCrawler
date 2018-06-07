@@ -4,10 +4,7 @@
 using namespace std;
 
 Catcher:: Catcher() {
-	curl = curl_easy_init();
-	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Firefox Browser"); //set an explorer attributively
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+	curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
 void Catcher:: printLog(const string &Log) {
@@ -20,6 +17,11 @@ bool Catcher:: saveFile(const string &url, const string &fileName, const bool &i
 		return true;
 	}
 	CURLcode res;
+	CURL *curl;
+	curl = curl_easy_init();
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Firefox Browser"); //set an explorer attributively
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
 	freopen(fileName.c_str(), isImage? "wb" : "w", stdout);
@@ -31,8 +33,4 @@ bool Catcher:: saveFile(const string &url, const string &fileName, const bool &i
 		return false;
 	}
 	return true;
-}
-
-Catcher:: ~Catcher() {
-	curl_global_cleanup();
 }

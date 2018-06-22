@@ -15,3 +15,7 @@
 更新了Catcher(.h/.cpp)的单例模式，修改了Catcher中的curl的init与clean_up方式。
 
 更新了BaseCrawler(.h)中的init()接口。
+
+## 6.22
+
+更新了BaseObject的接口和Catcher的单例模式写法，以及Catcher里加入了重定向设置（爬douban的时候碰到了这个问题）

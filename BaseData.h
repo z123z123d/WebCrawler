@@ -25,16 +25,21 @@ protected:
     DataType type;
 public:
     BaseData (DataType _type): type(_type) {}
+
+// 设置BaseData内部数据统一接口，每种派生类Data实现其所需的接口
     virtual void setString(const string &) {};
     virtual void setInt(const int &) {};
     virtual void setDouble(const double &) {};
 
+// 获取BaseData内部数据统一接口，每种派生类Data实现其所需的接口
     virtual string getString() const {};
     virtual int getInt() const {};
     virtual double getDouble() const {};
     virtual vector<string> getVectorString() const {};
 
     virtual void printData (ofstream &) = 0;
+
+// 获取BaseData性质(名称/票房...)，每种派生类Data实现其所需的接口
     DataType getType();
 };
 
@@ -70,7 +75,7 @@ class VectorStringData : public BaseData {
     vector<string> data;
 public:
     VectorStringData (DataType _type): BaseData(_type) {}
-    virtual void setString(const string &); // add a string into data
+    virtual void setString(const string &); // 给data新增一个string
     virtual vector<string> getVectorString() const;
     virtual void printData (ofstream &);
 };

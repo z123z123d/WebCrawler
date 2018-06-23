@@ -19,8 +19,8 @@ void DoubanCrawler:: addObject (BaseObject* object) {
 
 void DoubanCrawler:: readFile (const string &HTML, string &str) {
     ifstream fin (HTML.c_str());
-    cout << "READ: " << HTML << endl; //
     for (char c; c = fin.get(), c != EOF; str.push_back (c));
+    fin.close();
 }
 
 bool DoubanCrawler:: getData (string content, BaseData *data) {
@@ -130,8 +130,6 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
                 content = matchstring.suffix().str();
                 SEARCH_CHK(content, "<li>([^<]*)</li>");
                 tmp = tmp + ":" + matchstring[1].str();
-                //if (SEARCH (content, "<li><a[^<]*>([^<]*)</a></li>") && matchstring[1].str().length())
-                //tmp = tmp + "(" + matchstring[1].str() + ")";
                 data-> setString(tmp);
                 content = matchstring.suffix().str();
             }
@@ -166,11 +164,12 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
                 }
                 data-> setString(ans + "\n");
                 content = matchstring.suffix().str();
+                system ("rm tmp.html");
             }
             return true;
 
         case _photos:
-            while (SEARCH(content, "<a href=\"https://movie.douban.com/photos/photo/([0-9]+)/\"><img src=\"((?:https?://)?.*.jpg)\" alt=\"图片\" />")) {
+            while (SEARCH(content, "<a href=\"https://movie.douban.com/photos/photo/([0-9]+)/\"><img src=\"((?:https?://)?.*p[0-9]*.jpg)\" alt=\"图片\" />")) {
                 data-> setString (matchstring[2].str());
                 content = matchstring.suffix().str();
             }
@@ -179,7 +178,7 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
 }
 
 void DoubanCrawler:: init() {
-    ifstream fin ("crawler_configuration.txt");
+    ifstream fin ("crawler-configuration.txt");
     for (int i = 0; i < 15; i++) {
         int x = 1;
 #ifdef DEBUG
@@ -199,8 +198,7 @@ void DoubanCrawler:: downloadPics (DoubanMovieObject *object) {
         cout << "photo: " << it << endl;
         string content(it);
         smatch matchstring;
-        SEARCH(content, "[0-9]+");
-        catcher.saveFile(it, "pic/" + matchstring.str(), true);
+        catcher.saveFile(it, "pic/" + matchstring[1].str(), true);
     }
 }
 
@@ -223,18 +221,20 @@ DoubanMovieObject* DoubanCrawler:: scanPage (const string& HTML) {
     ouf << endl; //
 #endif
 
-    cout << "Scanned:" << (object->getData(_name)->getVectorString())[0] << endl; //
+    fprintf (stderr, "Scanned: %s\n", (object->getData(_name)->getVectorString())[0]); //
     return object;
 }
 
 void DoubanCrawler:: work() {
+    ofstream _ouf ("con");
     string StartUrl = "https://movie.douban.com/";
     vector<string> QUrl {StartUrl};
     map<int, bool> visited;
 
     system (("md " + string("pic")).c_str());
-    for (int i = 0; i < QUrl.size() && i < 2; i++) {
-        clock_t delay = 0.1 * CLOCKS_PER_SEC, start = clock();
+    srand ((unsigned) time (NULL));
+    for (int i = 0; i < QUrl.size() && i <= 10; i++) {
+        clock_t delay = (rand() % 100 + 100) / 400 * CLOCKS_PER_SEC, start = clock();
 
         smatch matchstring;
         string Url = QUrl[i], content;
@@ -242,7 +242,7 @@ void DoubanCrawler:: work() {
         catcher.saveFile (Url, HTML, false);
         readFile (HTML, content);
 
-        while (SEARCH(content, "https://movie.douban.com/subject/([0-9])+")) {
+        while (SEARCH(content, "https://movie.douban.com/subject/([0-9]+)(?:[^0-9])")) {
             int id = atoi (matchstring[1].str().c_str());
             if (! visited[id]) {
                 visited[id] = 1;
@@ -252,15 +252,16 @@ void DoubanCrawler:: work() {
         }
 
         if (i) {
+            _ouf << i << endl;
             DoubanMovieObject *object = scanPage (HTML);
+            SEARCH(Url, "subject/([0-9]+)[^0-9]?");
             downloadPics (object);
             addObject (object);
         }
 
-        system (("rm " + HTML).c_str());
         while (clock() - start < delay);
     }
-    cout << QUrl.size() << endl;
-    for (int i = 0; i <= 1; i++)
-        cout << QUrl[i] << endl;
+    _ouf << QUrl.size() << endl;
+    for (int i = 0; i < QUrl.size(); i++)
+        _ouf << QUrl[i] << endl;
 }

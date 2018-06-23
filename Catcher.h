@@ -10,11 +10,10 @@ class Catcher {
     ~Catcher() { curl_global_cleanup(); }
 
 public:
-    void init() {}
-    static Catcher& getCatcher() {
+    static Catcher& getCatcher() { // 通过getCatcher获得Catcher单例的引用
         static Catcher _catcher;
         return _catcher;
     }
-    void printLog(const string &);
-    bool saveFile(const string &, const string &, const bool & = 0);
+    void printLog(const string &); // 将信息输出到终端
+    bool saveFile(const string &, const string &, const bool & = 0); // 保存一个html/jpg文件(地址url)到本地文件(fileName),isImage代表其是否为Image
 };

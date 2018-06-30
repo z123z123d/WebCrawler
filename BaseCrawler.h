@@ -1,17 +1,26 @@
 #pragma once
 #include <bits/stdc++.h>
-#include "Catcher.h"
-#include "BaseObject.h"
+#include "BaseCrawler.h"
+#include "DoubanObject.h"
 using namespace std;
 
-class BaseCrawler {
+static Catcher &catcher = Catcher:: getCatcher();
+
+class DoubanCrawler : public BaseCrawler {
+    vector<DataType> TargetDataList;
+    vector<DoubanMovieObject*> ObjectList;
+    virtual void addTargetData (const DataType &);
+    virtual void addObject (BaseObject*);
+
 public:
-    virtual void addTargetData (const DataType &) = 0; // 给爬虫新增一种需要爬的目标数据
-    virtual void addObject (BaseObject*) = 0; // 给爬虫新增一个爬完的电影
-    virtual void init() = 0;
-    /* 初始化统一接口，从配置文件./crawler-configuration.txt里输入初始化信息：
-     * 共15行，第i行一个整数0/1表示是否爬去DataType中第i种数据
-     */
-    virtual void work() = 0; // 爬虫主程序统一接口
-	virtual ~BaseCrawler();
+	virtual ~DoubanCrawler() {
+		for (auto it : ObjectList)
+			delete it;
+	}
+    virtual void init();
+    virtual void work();
+    bool getData (string content, BaseData *data); // 从content中抓取处一个数据(名称、评分等)data
+    void readFile (const string&, string&); // 将一个文件所有内容读入字符串
+    void downloadPics (DoubanMovieObject *); // 将一部电影的所有剧照下载到本地
+    DoubanMovieObject* scanPage (const string&); // 扫描一个网页，返回一个Object，为该网页对应的电影
 };

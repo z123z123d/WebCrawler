@@ -44,9 +44,9 @@ bool Catcher:: saveFile(const string &url, const string &fileName, const bool &i
 	CURL *curl;
 	FILE *fp = fopen(fileName.c_str(), isImage? "wb" : "w");
 	curl = curl_easy_init();
-	//curl_easy_setopt(curl, CURLOPT_USERAGENT, AgentList[rand() % 20].c_str());
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "Firefox");
-	curl_easy_setopt(curl, CURLOPT_PROXY, "113.121.240.27:808");
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, AgentList[rand() % 20].c_str());
+    //curl_easy_setopt(curl, CURLOPT_USERAGENT, "Firefox");
+	//curl_easy_setopt(curl, CURLOPT_PROXY, "113.121.240.27");
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -61,6 +61,8 @@ bool Catcher:: saveFile(const string &url, const string &fileName, const bool &i
 #ifdef PRINTLOG
 		printLog("Fail to download " + url + ".\n");
 #endif
+		if (res == CURLE_COULDNT_CONNECT)
+			printLog ("不能连接到remote 主机或者代理\n");
 		system(("rm " + fileName).c_str());
 		return false;
 	}

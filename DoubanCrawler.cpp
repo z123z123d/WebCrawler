@@ -6,8 +6,8 @@ using namespace std;
 
 #define DEBUG
 
-#define SEARCH(content, str) regex_search (content, matchstring, regex(str))
-#define SEARCH_CHK(content, str) if (SEARCH(content, str) == false) return false
+#define SEARCH(A, B) regex_search (A, matchstring, regex(B))
+#define SEARCH_CHK(A, B) if (SEARCH(A, B) == false) return false
 
 void DoubanCrawler:: addTargetData (const DataType &datatype) {
     TargetDataList.push_back (datatype);
@@ -111,11 +111,8 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
             SEARCH_CHK(content, "<[^<]*rating_num[^<]*>([^<]*)</strong>");
             double rating_double = 0;
             string rating_string (matchstring[1].str());
-            if (rating_string.length()) {
-                stringstream tmp;
-                tmp << rating_string;
-                tmp >> rating_double;
-            }
+            if (rating_string.length())
+                rating_double = stod (rating_string);
             else
                 rating_double = -1;
             data->setDouble(rating_double);
@@ -135,26 +132,29 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
             }
             return true;
 
-        case _reviews:
+        case _reviews: {
             static map<int, bool> visited_review;
-            while (SEARCH (content, "https://movie.douban.com/review/([0-9]+)")) {
-                int id = atoi (matchstring[1].str().c_str());
+            bool flag = 0;
+            while (SEARCH (content, "https://movie.douban.com/review/([0-9]+)(?:[^0-9])")) {
+                int id = stoi(matchstring[1].str());
                 if (visited_review[id] == true) {
                     content = matchstring.suffix().str();
                     continue;
                 }
                 visited_review[id] = true;
+                flag = true;
 
                 string content_, tmp_file, ans;
                 catcher.saveFile(matchstring.str(), tmp_file = "tmp.html");
                 readFile(tmp_file, content_);
 
+                content = matchstring.suffix().str();
                 SEARCH(content_, "<meta name=\"description\" content=\"([^<]*)\" />");
                 ans = matchstring[1].str();
 
                 SEARCH(content_, "data-author=\"(.*)\"");
                 if (matchstring[1].str().length())
-                    ans = ans + "\n" + matchstring[1].str();
+                    ans = (flag ? "\n" : "") + ans + "\n" + matchstring[1].str();
                 content_ = matchstring.suffix().str();
 
                 while (SEARCH(content_, "<p>([^<]*)</p>")) {
@@ -162,14 +162,15 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
                     ans = ans + "\n" + matchstring[1].str();
                     content_ = matchstring.suffix().str();
                 }
-                data-> setString(ans + "\n");
-                content = matchstring.suffix().str();
-                system ("rm tmp.html");
+                data->setString(ans + "\n");
+                system("rm tmp.html");
             }
             return true;
+        }
 
         case _photos:
             while (SEARCH(content, "<a href=\"https://movie.douban.com/photos/photo/([0-9]+)/\"><img src=\"((?:https?://)?.*p[0-9]*.jpg)\" alt=\"图片\" />")) {
+
                 data-> setString (matchstring[2].str());
                 content = matchstring.suffix().str();
             }
@@ -198,7 +199,8 @@ void DoubanCrawler:: downloadPics (DoubanMovieObject *object) {
         cout << "photo: " << it << endl;
         string content(it);
         smatch matchstring;
-        catcher.saveFile(it, "pic/" + matchstring[1].str(), true);
+        SEARCH (it, "p([0-9]+)[^0-9]");
+        catcher.saveFile(it, "pic/" + matchstring[1].str() + ".jpg", true);
     }
 }
 

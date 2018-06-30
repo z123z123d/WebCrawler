@@ -1,4 +1,4 @@
-#pragma once
+z#pragma once
 #include <bits/stdc++.h>
 #include "BaseData.h"
 using namespace std;
@@ -10,4 +10,8 @@ public:
     virtual vector<BaseData*> getDataSet() const; // 获取此Object内部数据集合
     virtual void printObject (ofstream &); // 输出数据，根据需要可重新实现
     virtual int getDataSize() const; // 获取数据集合大小
+	~BaseObject() {
+		for (auto it : Dataset)
+			delete it;
+	}
 };

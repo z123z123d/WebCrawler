@@ -13,4 +13,5 @@ public:
      * 共15行，第i行一个整数0/1表示是否爬去DataType中第i种数据
      */
     virtual void work() = 0; // 爬虫主程序统一接口
+	virtual ~BaseCrawler();
 };

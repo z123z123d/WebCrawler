@@ -1,12 +1,12 @@
 #pragma once
 #include <bits/stdc++.h>
+#include "BaseObject.h"
 #include "BaseCrawler.h"
-#include "DoubanObject.h"
 using namespace std;
 
 static Catcher &catcher = Catcher:: getCatcher();
 
-static DataType DoubanMovieDataList[] = {
+static vector<DataType> DoubanMovieDataList = {
 		_name,
 		_date,
 		_director,
@@ -36,8 +36,12 @@ public:
     virtual void addObject (BaseObject*);
     virtual void init();
     virtual void work();
+	virtual vector<BaseObject*>& getObject();
+	virtual vector<DataType> getDatatype();
+	
     bool getData (string content, BaseData *data); // 从content中抓取处一个数据(名称、评分等)data
     void readFile (const string&, string&); // 将一个文件所有内容读入字符串
     void downloadPics (BaseObject *); // 将一部电影的所有剧照下载到本地
     BaseObject* scanPage (const string&); // 扫描一个网页，返回一个Object，为该网页对应的电影
+	
 };

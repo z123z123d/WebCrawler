@@ -23,6 +23,14 @@ void DoubanCrawler:: readFile (const string &HTML, string &str) {
     fin.close();
 }
 
+vector<BaseObject*>& DoubanCrawler:: getObject() {
+	return ObjectList;
+}
+
+vector<DataType> DoubanCrawler:: getDatatype() {
+	return TargetDataList;
+}
+
 BaseData* DoubanCrawler:: newData (DataType type) {
     BaseData *data = NULL;
     if (type == _rating)
@@ -189,15 +197,8 @@ bool DoubanCrawler:: getData (string content, BaseData *data) {
 }
 
 void DoubanCrawler:: init() {
-    ifstream fin ("crawler-configuration.txt");
-    for (int i = 0; i < 15; i++) {
-        int x = 1;
-#ifdef DEBUG
-        fin >> x;
-#endif
-        if (x)
-            addTargetData(DataType (i));
-    }
+	string config = "douban-configuration.txt";
+	TargetDataList = readConfiguration (config);
 }
 
 #ifdef DEBUG

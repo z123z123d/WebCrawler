@@ -14,3 +14,14 @@ void BaseObject:: printObject (ofstream &ouf) {
 int BaseObject:: getDataSize() const {
     return DataSet.size();
 }
+
+void BaseObject:: addData (BaseData *data) {
+    DataSet.push_back (data);
+}
+
+BaseData* BaseObject:: getData (DataType type) const {
+    for (auto it : DataSet)
+        if (it->getType() == type)
+            return it;
+    return nullptr;
+}

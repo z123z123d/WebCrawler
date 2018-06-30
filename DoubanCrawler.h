@@ -13,6 +13,10 @@ class DoubanCrawler : public BaseCrawler {
     virtual void addObject (BaseObject*);
 
 public:
+	virtual ~DoubanCrawler() {
+		for (auto it : ObjectList)
+			delete it;
+	}
     virtual void init();
     virtual void work();
     bool getData (string content, BaseData *data); // 从content中抓取处一个数据(名称、评分等)data

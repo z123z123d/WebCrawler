@@ -1,4 +1,4 @@
-z#pragma once
+#pragma once
 #include <bits/stdc++.h>
 #include "BaseData.h"
 using namespace std;
